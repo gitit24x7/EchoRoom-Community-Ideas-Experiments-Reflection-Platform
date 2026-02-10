@@ -1,151 +1,214 @@
-import Link from "next/link";
+"use client";
 
-import Header from'./components/Header';
-import Hero from './components/Hero';
-import HowItWorksCard from './components/HowItWorksCard';
-import CapabilitiesCard from './components/CapabilitiesCard';
-import Footer from './components/Footer';
+import { useEffect, useState } from "react";
 
+export default function HomePage() {
+  const [dark, setDark] = useState(false);
 
-export default function Home() {
-
-  const steps = [
-    {
-      title: "Share Ideas",
-      emoji: "💡",
-      color: "text-indigo-600",
-      text: "Post your thoughts, proposals, or questions to the community."
-    },
-    {
-      title: "Run Experiments",
-      emoji: "🧪",
-      color: "text-emerald-600",
-      text: "Test your ideas with small, focused experiments."
-    },
-    {
-      title: "Track Outcomes",
-      emoji: "📊",
-      color: "text-amber-600",
-      text: "Record what happened and gather data from your experiments."
-    },
-    {
-      title: "Reflect Together",
-      emoji: "🧠",
-      color: "text-rose-600",
-      text: "Share insights and learn from both successes and surprises."
+  useEffect(() => {
+    const saved = localStorage.getItem("color-theme");
+    if (
+      saved === "dark" ||
+      (!saved && window.matchMedia("(prefers-color-scheme: dark)").matches)
+    ) {
+      document.documentElement.classList.add("dark");
+      setDark(true);
     }
-  ];
+  }, []);
 
-  const features = [
-    "Share ideas with a curious community",
-    "Design and run small experiments",
-    "Track and document your results",
-    "Learn from others' experiences and insights"
-  ];
+  const toggleTheme = () => {
+    if (dark) {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("color-theme", "light");
+      setDark(false);
+    } else {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("color-theme", "dark");
+      setDark(true);
+    }
+  };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-emerald-50 text-gray-900">
+    <main className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors">
 
+      {/* NAVBAR */}
+      <nav className="sticky top-0 z-50 bg-white/80 dark:bg-slate-800/80 backdrop-blur border-b border-slate-200 dark:border-slate-700">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
 
-
-      {/* Hero */}
-      <section className="max-w-6xl mx-auto px-6 py-12 md:py-20">
-        <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-          Turn Ideas into
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-emerald-500">
-            {" "}Actionable Learning
-          </span>
-        </h2>
-
-        <p className="text-base text-gray-700 max-w-xl leading-relaxed mb-6">
-          EchoRoom is a collaborative space where you can share ideas,
-          test them through small experiments, and reflect on the results
-          with a supportive community.
-        </p>
-
-        <button
-          disabled
-          className="px-6 py-3 rounded-lg bg-indigo-600/20 text-indigo-700 cursor-not-allowed border border-indigo-300 text-base font-medium"
-        >
-          Start Exploring (Coming Soon)
-        </button>
-      </section>
-
-      {/* How It Works */}
-      <section className="bg-white border-y">
-        <div className="max-w-6xl mx-auto px-6 py-16 md:py-20">
-          <h3 className="text-3xl font-semibold mb-16 text-center">
-            How EchoRoom Works
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {steps.map((item) => (
-              <div
-                key={item.title}
-                className="rounded-xl border p-6 bg-gradient-to-br from-white to-gray-50 hover:shadow-lg transition-shadow"
-              >
-                <div className="text-5xl mb-4">{item.emoji}</div>
-
-                <h4 className={`font-semibold text-lg mb-3 ${item.color}`}>
-                  {item.title}
-                </h4>
-
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  {item.text}
-                </p>
-              </div>
-            ))}
+          <div className="text-2xl font-bold text-blue-600">
+            EchoRoom
           </div>
-        </div>
-      </section>
 
-      {/* Features */}
-      <section className="max-w-6xl mx-auto px-6 py-16 md:py-20">
-        <h3 className="text-3xl font-semibold mb-12">
-          What You Can Do on EchoRoom
-        </h3>
+          <div className="hidden md:flex gap-8 text-slate-700 dark:text-slate-300">
+            <a className="hover:text-blue-600 cursor-pointer">Ideas</a>
+            <a className="hover:text-blue-600 cursor-pointer">Experiments</a>
+            <a className="hover:text-blue-600 cursor-pointer">Reflection</a>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mb-8">
-          {features.map((text) => (
-            <div
-              key={text}
-              className="flex items-start gap-3 bg-white rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow"
+          <div className="flex items-center gap-4">
+            <button
+              onClick={toggleTheme}
+              className="text-xl hover:scale-110 transition"
             >
-              <span className="text-emerald-500 mt-0.5 text-lg flex-shrink-0">✔</span>
-              <p className="text-base text-gray-700 leading-relaxed">{text}</p>
-            </div>
-          ))}
+              {dark ? "☀️" : "🌙"}
+            </button>
+
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow">
+              Join Community
+            </button>
+          </div>
+
+        </div>
+      </nav>
+
+
+      {/* HERO */}
+      <section className="max-w-4xl mx-auto text-center px-6 pt-24 pb-16">
+
+        <h1 className="text-5xl md:text-6xl font-bold text-slate-800 dark:text-white leading-tight">
+
+          Turn Ideas into
+
+          <span className="block text-blue-600 mt-2">
+            Actionable Learning
+          </span>
+
+        </h1>
+
+        <p className="mt-6 text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+
+          EchoRoom helps communities transform ideas into experiments,
+          insights, and meaningful learning — collaboratively and transparently.
+
+        </p>
+
+        <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full shadow-lg transition hover:-translate-y-1">
+
+            Start Exploring →
+
+          </button>
+
+          <button className="border border-slate-300 dark:border-slate-600 px-8 py-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
+
+            Learn More
+
+          </button>
+
         </div>
 
-        <p className="text-sm text-gray-500 mt-8 leading-relaxed">
-          🚧 We're building these features together during the Open Source Quest (OSQ) initiative.
-        </p>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-white border-t mt-12">
-        <div className="max-w-6xl mx-auto px-6 py-8 text-sm text-gray-500 flex flex-col md:flex-row justify-between items-center gap-4">
-          <span>Built during Open Source Quest</span>
+
+      {/* FEATURES */}
+      <section className="max-w-7xl mx-auto px-6 pb-24">
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+          <FeatureCard emoji="💡"
+            title="Share Ideas"
+            desc="Post and discuss ideas openly with your community to spark innovation."
+          />
+
+          <FeatureCard emoji="🧪"
+            title="Run Experiments"
+            desc="Validate ideas through focused real-world experiments and tests."
+          />
+
+          <FeatureCard emoji="📊"
+            title="Track Outcomes"
+            desc="Capture results and build collective knowledge from detailed outcomes."
+          />
+
+          <FeatureCard emoji="🧠"
+            title="Reflect & Learn"
+            desc="Improve continuously through shared insights and reflection."
+          />
+
         </div>
+
+      </section>
+
+
+      {/* CTA */}
+      <section className="bg-blue-600 py-16 text-center">
+
+        <div className="max-w-3xl mx-auto px-6">
+
+          <h2 className="text-3xl font-bold text-white">
+
+            Start building and learning together
+
+          </h2>
+
+          <p className="text-blue-100 mt-4">
+
+            Join EchoRoom and turn your ideas into meaningful experiments today.
+            No credit card required.
+
+          </p>
+
+          <button className="mt-6 bg-white text-blue-600 px-8 py-3 rounded-full font-semibold shadow hover:bg-gray-100">
+
+            Get Started
+
+          </button>
+
+        </div>
+
+      </section>
+
+
+      {/* FOOTER */}
+      <footer className="border-t border-slate-200 dark:border-slate-700">
+
+        <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between">
+
+          <p className="text-sm text-slate-500">
+            © 2026 EchoRoom — Built during Open Source Quest
+          </p>
+
+          <div className="flex gap-6 text-sm text-slate-500 mt-4 md:mt-0">
+            <a className="hover:text-blue-600">About</a>
+            <a className="hover:text-blue-600">Community</a>
+            <a className="hover:text-blue-600">GitHub</a>
+          </div>
+
+        </div>
+
       </footer>
 
-      <Header />
-
-
-      {/* Hero */}
-      <Hero />
-
-      {/* How It Works */}
-      <HowItWorksCard />
-
-
-      {/* Capabilities */}
-      <CapabilitiesCard/>
-      
-
-      {/* Footer */}
-      <Footer/>
-
     </main>
+  );
+}
+
+
+
+function FeatureCard({
+  emoji,
+  title,
+  desc,
+}: {
+  emoji: string;
+  title: string;
+  desc: string;
+}) {
+  return (
+    <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-lg transition">
+
+      <div className="text-3xl mb-3">
+        {emoji}
+      </div>
+
+      <h3 className="font-semibold text-lg text-slate-800 dark:text-white">
+        {title}
+      </h3>
+
+      <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
+        {desc}
+      </p>
+
+    </div>
   );
 }

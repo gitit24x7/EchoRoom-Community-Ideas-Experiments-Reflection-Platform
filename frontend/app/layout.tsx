@@ -2,7 +2,7 @@ import "../styles/globals.css";
 
 export const metadata = {
   title: "EchoRoom",
-  description: "Community Ideas, Experiments & Reflection Platform",
+  description: "Turn Ideas into Actionable Learning",
 };
 
 export default function RootLayout({
@@ -12,9 +12,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="antialiased bg-gray-50 text-gray-900">
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
+
