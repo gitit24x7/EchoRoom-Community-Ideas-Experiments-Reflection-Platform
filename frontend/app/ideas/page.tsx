@@ -1,7 +1,11 @@
 "use client";
 
+import LoadingState from "../components/LoadingState";
+import ErrorState from "../components/ErrorState";
 import { PageLayout } from "../community/PageLayout";
 import { useEffect, useState } from "react";
+import { apiFetch } from "../lib/api";
+
 
 interface Idea {
   id: number;
@@ -16,25 +20,21 @@ const [error, setError] = useState<string | null>(null);
 
 useEffect(() => {
   const fetchIdeas = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  try {
+    setLoading(true);
+    setError(null);
 
-      const res = await fetch("http://localhost:5000/ideas");
-      const data = await res.json();
+    const ideasData = await apiFetch<Idea[]>("/ideas");
 
-      if (!data.success) {
-        throw new Error("Failed to fetch ideas");
-      }
+    setIdeas(ideasData);
 
-      setIdeas(data.ideas);
+  } catch (err: any) {
+    setError(err.message || "Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
 
-    } catch (err: any) {
-      setError(err.message || "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   fetchIdeas();
 }, []);
@@ -43,28 +43,20 @@ useEffect(() => {
 if (loading) {
   return (
     <PageLayout>
-      <div className="section">
-        <div className="card text-center py-12">
-          <h2 className="text-xl font-semibold">Loading ideas...</h2>
-        </div>
-      </div>
+      <LoadingState message="Loading ideas..." />
     </PageLayout>
   );
 }
 
+
 if (error) {
   return (
     <PageLayout>
-      <div className="section">
-        <div className="card text-center py-12">
-          <h2 className="text-xl font-semibold text-red-600">
-            Error: {error}
-          </h2>
-        </div>
-      </div>
+      <ErrorState message={error} />
     </PageLayout>
   );
 }
+
 
 
   return (

@@ -3,9 +3,12 @@
 import { useEffect, useState } from "react";
 import { BookOpen, MessageSquare } from "lucide-react";
 import { PageLayout } from "../community/PageLayout";
+import { apiFetch } from "../lib/api";
+import LoadingState from "../components/LoadingState";
+import ErrorState from "../components/ErrorState";
 
 interface Reflection {
-  id?: number;
+  id: number;
   title: string;
   outcome: string;
   learning: string;
@@ -23,40 +26,77 @@ export default function ReflectionPage() {
 
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
 
-    fetch("http://localhost:5000/reflections")
-      .then(res => res.json())
-      .then(data => {
+    const fetchReflections = async () => {
 
-        if (data.success) {
-          setReflections(data.data || data.reflections || []);
-        }
+      try {
+
+        setLoading(true);
+        setError(null);
+
+        const reflectionsData = await apiFetch<Reflection[]>("/reflections");
+
+        setReflections(reflectionsData);
+
+      } catch (err: any) {
+
+        setError(err.message || "Failed to fetch reflections");
+
+      } finally {
 
         setLoading(false);
 
-      })
-      .catch(err => {
+      }
 
-        console.error(err);
-        setLoading(false);
+    };
 
-      });
+    fetchReflections();
 
   }, []);
 
+
+  // Error state
+  if (error) {
+    return (
+      <PageLayout>
+        <ErrorState message={error} />
+      </PageLayout>
+    );
+  }
+
+
+  // Loading state
+  if (loading) {
+    return (
+      <PageLayout>
+        <LoadingState message="Loading reflections..." />
+      </PageLayout>
+    );
+  }
+
+
   return (
+
     <PageLayout>
+
       <main>
+
         <div className="container py-16">
+
           <div className="max-w-3xl mx-auto">
 
+            {/* Header */}
             <div className="flex items-center gap-3 mb-6">
+
               <BookOpen className="h-8 w-8 text-purple-500 dark:text-purple-400" />
+
               <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
                 Reflection
               </h1>
+
             </div>
 
             <p className="text-lg text-gray-600 dark:text-gray-300 mb-10">
@@ -64,63 +104,95 @@ export default function ReflectionPage() {
             </p>
 
 
-            {loading && (
-              <p className="text-gray-500">Loading reflections...</p>
-            )}
+            {/* Empty state */}
+            {reflections.length === 0 ? (
+
+              <div className="card text-center py-12">
+
+                <h2 className="text-xl font-semibold">
+                  No reflections yet
+                </h2>
+
+                <p className="text-gray-500 mt-2">
+                  Reflections will appear here once added.
+                </p>
+
+              </div>
+
+            ) : (
+
+              <div className="space-y-6">
+
+                {reflections.map((ref) => (
+
+                  <div
+                    key={ref.id}
+                    className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6"
+                  >
+
+                    {/* Title + outcome */}
+                    <div className="flex items-start justify-between mb-3">
+
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                        {ref.title}
+                      </h3>
+
+                      <span
+                        className={`text-xs font-medium px-3 py-1 rounded-full ${
+                          outcomeColors[ref.outcome] || ""
+                        }`}
+                      >
+                        {ref.outcome}
+                      </span>
+
+                    </div>
 
 
-            <div className="space-y-6">
+                    {/* Learning */}
+                    <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded-r-lg p-4 mb-4">
 
-              {reflections.map((ref, i) => (
+                      <div className="flex items-start gap-2">
 
-                <div key={i}
-                  className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6">
+                        <MessageSquare className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" />
 
-                  <div className="flex items-start justify-between mb-3">
+                        <p className="text-sm italic">
+                          "{ref.learning}"
+                        </p>
 
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                      {ref.title}
-                    </h3>
+                      </div>
 
-                    <span className={`text-xs font-medium px-3 py-1 rounded-full ${outcomeColors[ref.outcome] || ""}`}>
-                      {ref.outcome}
-                    </span>
-
-                  </div>
+                    </div>
 
 
-                  <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded-r-lg p-4 mb-4">
+                    {/* Author + date */}
+                    <div className="flex justify-between text-xs text-gray-500">
 
-                    <div className="flex items-start gap-2">
+                      <span>
+                        By {ref.author}
+                      </span>
 
-                      <MessageSquare className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" />
-
-                      <p className="text-sm italic">
-                        "{ref.learning}"
-                      </p>
+                      <span>
+                        {ref.date}
+                      </span>
 
                     </div>
 
                   </div>
 
+                ))}
 
-                  <div className="flex justify-between text-xs text-gray-500">
+              </div>
 
-                    <span>By {ref.author}</span>
-                    <span>{ref.date}</span>
-
-                  </div>
-
-                </div>
-
-              ))}
-
-            </div>
+            )}
 
           </div>
+
         </div>
+
       </main>
+
     </PageLayout>
+
   );
 
 }

@@ -2,52 +2,90 @@
 
 import { useState, useEffect } from "react";
 import { PageLayout } from "../community/PageLayout";
+import { apiFetch } from "../lib/api";
+import LoadingState from "../components/LoadingState";
+import ErrorState from "../components/ErrorState";
 
-export default function ExperimentsPage() {
-  async function createExperiment() {
-
-  const res = await fetch("http://localhost:5000/experiments", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      title: "New Experiment",
-      description: "Created from frontend",
-      status: "active",
-    }),
-  });
-
-  const data = await res.json();
-
-  if (data.success) {
-    setExperiments([...experiments, data.data]);
-  }
-
+interface Experiment {
+  id: number;
+  title: string;
+  description: string;
+  status: string;
+  progress: number;
 }
 
+export default function ExperimentsPage() {
 
-  // Sample experiment data
-  const [experiments, setExperiments] = useState<any[]>([]);
-const [loading, setLoading] = useState(true);
+  const [experiments, setExperiments] = useState<Experiment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-useEffect(() => {
-  fetch("http://localhost:5000/experiments")
-    .then((res) => res.json())
-    .then((data) => {
-  setExperiments(data.data);
-  setLoading(false);
-})
+  // Fetch experiments using reusable apiFetch
+  useEffect(() => {
 
-    .catch((err) => {
-      console.error("Failed to fetch experiments:", err);
-      setLoading(false);
-    });
-}, []);
+    const fetchExperiments = async () => {
+
+      try {
+
+        setLoading(true);
+        setError(null);
+
+        const experimentsData = await apiFetch<Experiment[]>("/experiments");
+
+        setExperiments(experimentsData);
+
+      } catch (err: any) {
+
+        setError(err.message || "Failed to fetch experiments");
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    };
+
+    fetchExperiments();
+
+  }, []);
 
 
+  // Create experiment
+  async function createExperiment() {
 
-  // Status color
+    try {
+
+      const res = await fetch("http://localhost:5000/experiments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: "New Experiment",
+          description: "Created from frontend",
+          status: "active",
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Failed to create experiment");
+      }
+
+      setExperiments([...experiments, data.data]);
+
+    } catch (err: any) {
+
+      setError(err.message || "Failed to create experiment");
+
+    }
+
+  }
+
+
+  // Status text color
   const getStatusTextColor = (status: string) => {
     if (status === "Completed") return "text-green-600 dark:text-green-400";
     if (status === "In Progress") return "text-blue-600 dark:text-blue-400";
@@ -62,7 +100,28 @@ useEffect(() => {
   };
 
 
+  // Error state
+  if (error) {
+    return (
+      <PageLayout>
+        <ErrorState message={error} />
+      </PageLayout>
+    );
+  }
+
+
+  // Loading state
+  if (loading) {
+    return (
+      <PageLayout>
+        <LoadingState message="Loading experiments..." />
+      </PageLayout>
+    );
+  }
+
+
   return (
+
     <PageLayout>
 
       <div className="section">
@@ -81,18 +140,8 @@ useEffect(() => {
         </div>
 
 
-        {/* Empty State */}
-        {/* Loading State */}
-{loading ? (
-
-  <div className="card text-center py-16">
-    <p className="text-gray-600 dark:text-gray-300">
-      Loading experiments...
-    </p>
-  </div>
-
-) : experiments.length === 0 ? (
-
+        {/* Empty state */}
+        {experiments.length === 0 ? (
 
           <div className="card text-center py-16">
 
@@ -105,23 +154,22 @@ useEffect(() => {
             </p>
 
             <button
-  className="btn-primary"
-  onClick={createExperiment}
->
-  Create Experiment
-</button>
-
+              className="btn-primary"
+              onClick={createExperiment}
+            >
+              Create Experiment
+            </button>
 
           </div>
 
         ) : (
 
-          /* Experiments Grid */
+          /* Experiments grid */
           <div className="grid gap-6 md:grid-cols-2">
 
-            {experiments.map((exp, index) => (
+            {experiments.map((exp) => (
 
-              <div key={index} className="card">
+              <div key={exp.id} className="card">
 
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                   {exp.title}
@@ -167,5 +215,7 @@ useEffect(() => {
       </div>
 
     </PageLayout>
+
   );
+
 }
