@@ -1,4 +1,10 @@
 import { Router, Request, Response } from "express";
+import {
+  getAllIdeas,
+  createIdea,
+  updateIdeaStatus,
+  IdeaStatus
+} from "../services/ideas.service";
 
 const router = Router();
 // helper: validate non-empty string
@@ -40,9 +46,11 @@ const allowedTransitions: Record<IdeaStatus, IdeaStatus[]> = {
 // GET /ideas
 router.get("/", (req: Request, res: Response) => {
   try {
+    const ideas = getAllIdeas();
+
     res.json({
       success: true,
-      ideas: ideas,
+      ideas,
     });
   } catch (error) {
   console.error("Error:", error);
@@ -60,30 +68,14 @@ router.post("/", (req: Request, res: Response) => {
   try {
     const { title, description } = req.body;
 
-// validate title
-if (!isValidString(title)) {
-  return res.status(400).json({
-    success: false,
-    message: "Valid title is required",
-  });
-}
+    if (!title || !description) {
+      return res.status(400).json({
+        success: false,
+        message: "Title and description are required",
+      });
+    }
 
-if (!isValidString(description)) {
-  return res.status(400).json({
-    success: false,
-    message: "Valid description is required",
-  });
-}
-
-
-    const newIdea: Idea = {
-      id: nextIdeaId++,
-      title,
-      description,
-      status: "proposed",
-    };
-
-    ideas.push(newIdea);
+    const newIdea = createIdea(title, description);
 
     res.status(201).json({
       success: true,
@@ -99,6 +91,7 @@ if (!isValidString(description)) {
 }
 
 });
+
 // PATCH /ideas/:id/status
 router.patch("/:id/status", (req: Request, res: Response) => {
   try {
@@ -130,21 +123,26 @@ if (!isValidStatus(status)) {
   });
 }
 
-    const idea = ideas.find(i => i.id === id);
+    const updatedIdea = updateIdeaStatus(id, status);
 
-    if (!idea) {
+    if (!updatedIdea) {
       return res.status(404).json({
         success: false,
         message: "Idea not found",
       });
     }
 
-    const allowed = allowedTransitions[idea.status];
+    res.json({
+      success: true,
+      idea: updatedIdea,
+    });
 
-    if (!allowed.includes(status)) {
+  } catch (error: any) {
+
+    if (error.message.includes("Invalid transition")) {
       return res.status(400).json({
         success: false,
-        message: `Invalid transition from '${idea.status}' to '${status}'`,
+        message: error.message,
       });
     }
 

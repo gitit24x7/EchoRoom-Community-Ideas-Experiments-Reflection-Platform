@@ -1,35 +1,20 @@
 import { Router, Request, Response } from "express";
 import { experiments } from "./experiments.routes";
 
+import {
+  createOutcome,
+  getAllOutcomes,
+  getOutcomesByExperimentId
+} from "../services/outcomes.service";
+
 const router = Router();
 
-/**
- * Outcome model (temporary in-memory)
- */
-interface Outcome {
-  id: number;
-  experimentId: number;
-  result: string;
-  notes: string;
-  createdAt: Date;
-}
 
-/**
- * Temporary storage
- */
-export let outcomes: Outcome[] = [];
-let nextId = 1;
-
-
-/**
- * POST /outcomes
- * Create a new outcome
- *
- * Learning loop rule enforced:
- * Experiment must exist before Outcome can be created
- */
+// POST /outcomes
 router.post("/", (req: Request, res: Response) => {
+
   try {
+
     const { experimentId, result, notes } = req.body;
 
     // 1. Validate required fields
@@ -40,63 +25,42 @@ router.post("/", (req: Request, res: Response) => {
       });
     }
 
-    // 2. Validate experiment exists
-    const experimentExists = experiments.find(
-      (e) => e.id === experimentId
-    );
-
-    if (!experimentExists) {
-      return res.status(400).json({
-        success: false,
-        message: "Experiment does not exist",
-      });
-    }
-
-    // 3. Create outcome
-    const newOutcome: Outcome = {
-      id: nextId++,
+    const outcome = createOutcome(
       experimentId,
       result,
-      notes: notes || "",
-      createdAt: new Date(),
-    };
-
-    // 4. Store outcome
-    outcomes.push(newOutcome);
+      notes
+    );
 
     // 5. Return response
     return res.status(201).json({
       success: true,
-      message: "Outcome created successfully",
-      data: newOutcome,
+      data: outcome,
     });
 
-  } catch (error) {
-    return res.status(500).json({
+  } catch {
+
+    res.status(500).json({
       success: false,
       message: "Failed to create outcome",
     });
+
   }
+
 });
 
 
-/**
- * GET /outcomes
- * Get all outcomes
- */
+// GET /outcomes
 router.get("/", (_req: Request, res: Response) => {
   return res.json({
     success: true,
     count: outcomes.length,
     data: outcomes,
   });
+
 });
 
 
-/**
- * GET /outcomes/:experimentId
- * Get outcomes for a specific experiment
- */
+// GET /outcomes/:experimentId
 router.get("/:experimentId", (req: Request, res: Response) => {
   try {
     const experimentId = Number(req.params.experimentId);
@@ -108,15 +72,12 @@ router.get("/:experimentId", (req: Request, res: Response) => {
       });
     }
 
-    const filteredOutcomes = outcomes.filter(
-      (outcome) => outcome.experimentId === experimentId
-    );
+  const outcomes = getOutcomesByExperimentId(experimentId);
 
-    return res.json({
-      success: true,
-      count: filteredOutcomes.length,
-      data: filteredOutcomes,
-    });
+  res.json({
+    success: true,
+    data: outcomes,
+  });
 
   } catch (error) {
     return res.status(500).json({
@@ -125,6 +86,5 @@ router.get("/:experimentId", (req: Request, res: Response) => {
     });
   }
 });
-
 
 export default router;
