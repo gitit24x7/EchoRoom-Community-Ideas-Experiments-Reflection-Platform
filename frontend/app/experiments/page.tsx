@@ -6,8 +6,7 @@ import { apiFetch } from "../lib/api";
 import LoadingState from "../components/LoadingState";
 import ErrorState from "../components/ErrorState";
 import BackButton from "../components/BackButton";
-import QuestionMark from "@/components/ui/question-mark";
-
+import ChartHistogramIcon from "@/components/ui/chart-histogram-icon";
 
 interface Experiment {
   id: number;
@@ -190,7 +189,7 @@ export default function ExperimentsPage() {
                       </div>
 
           <div className="flex items-center gap-3 mb-3">
-          <QuestionMark className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+          <ChartHistogramIcon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
             Experiments
           </h1>

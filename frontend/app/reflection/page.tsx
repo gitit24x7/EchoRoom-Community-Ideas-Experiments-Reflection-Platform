@@ -8,6 +8,7 @@ import LoadingState from "../components/LoadingState";
 import ErrorState from "../components/ErrorState";
 import BackButton from "../components/BackButton";
 import RefreshIcon from "@/components/ui/refresh-icon";
+import LibraryIcon from "@/components/ui/library-icon";
 
 interface Reflection {
   id: number;
@@ -148,7 +149,7 @@ export default function ReflectionPage() {
             <div className="flex items-center gap-3 mb-6">
               
 
-             <RefreshIcon className="h-8 w-8 text-blue-600 dark:text-white" />
+             <LibraryIcon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
 
 
               <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
