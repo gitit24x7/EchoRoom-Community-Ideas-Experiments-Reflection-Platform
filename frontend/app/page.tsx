@@ -104,31 +104,20 @@ return (
 
      {/* Signup Link */}
     <Link href="/signup">
-  <button
+  <Button
+    variant="primary"
     className="
       rounded-full
-      px-5 py-2.5
+      px-6 py-2.5
       text-sm
       font-normal
       tracking-tight
-      text-white
-
-      bg-gradient-to-r from-blue-500 to-[#9CCFFF]
-      
-      
-      
-      transition-all duration-300
-      
-      hover:scale-[1.05]
-      
-      hover:from-blue-400 hover:to-indigo-500
-
-      active:scale-[0.96]
     "
   >
     Sign Up
-  </button>
+  </Button>
 </Link>
+
 
 
       {/* Login Link */}
