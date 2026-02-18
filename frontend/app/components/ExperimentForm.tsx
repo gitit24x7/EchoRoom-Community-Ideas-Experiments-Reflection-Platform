@@ -7,12 +7,14 @@ import Container from "./ui/Container";
 import ReactMarkdown from "react-markdown";
 
 import { useExperiments } from "../context/ExperimentsContext";
+import { useIdeas } from "../context/IdeasContext";
 
 export function ExperimentForm() {
     const [preview, setPreview] = useState(false);
 
     const router = useRouter();
     const { addExperiment } = useExperiments();
+    const { ideas } = useIdeas();
     const [formData, setFormData] = useState({
         title: "",
         hypothesis: "",
@@ -22,11 +24,8 @@ export function ExperimentForm() {
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const ideas = [
-        { id: "1", title: "Idea 1: New Feature X" },
-        { id: "2", title: "Idea 2: Improve Performance Y" },
-        { id: "3", title: "Idea 3: Redesign UI Z" },
-    ];
+    // Mock data for ideas - REPLACED WITH CONTEXT
+    // const ideas = ...
 
     const handleChange = (
         e: React.ChangeEvent<
@@ -41,7 +40,14 @@ export function ExperimentForm() {
         e.preventDefault();
         setIsSubmitting(true);
 
-
+        try {
+            addExperiment({
+                title: formData.title,
+                description: formData.hypothesis,
+                startDate: formData.startDate,
+                endDate: formData.endDate,
+                linkedIdeaId: formData.linkedIdeaId || undefined,
+            });
 
             // Simulate a short delay for UX
             setTimeout(() => {

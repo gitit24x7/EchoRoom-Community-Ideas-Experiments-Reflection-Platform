@@ -98,15 +98,23 @@ export default function ExperimentsPage() {
     fetchExperiments();
   }, []);
 
+import Link from "next/link";
+import { PageLayout } from "../community/PageLayout";
+import { useExperiments } from "../context/ExperimentsContext";
+
+export default function ExperimentsPage() {
+  const { experiments } = useExperiments();
+
+  // Status color
   const getStatusTextColor = (status: string) => {
-    if (status === "completed") return "text-green-600 dark:text-green-400";
-    if (status === "in-progress") return "text-blue-600 dark:text-blue-400";
+    if (status === "Completed") return "text-green-600 dark:text-green-400";
+    if (status === "In Progress") return "text-blue-600 dark:text-blue-400";
     return "text-gray-600 dark:text-gray-400";
   };
 
   const getProgressColor = (status: string) => {
-    if (status === "completed") return "bg-green-500";
-    if (status === "in-progress") return "bg-blue-500";
+    if (status === "Completed") return "bg-green-500";
+    if (status === "In Progress") return "bg-blue-500";
     return "bg-gray-400";
   };
 
@@ -130,6 +138,24 @@ export default function ExperimentsPage() {
     <PageLayout>
       <div className="section">
         {/* Header */}
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-3">
+              Experiments
+            </h1>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl">
+              Track and manage experiments to test ideas and learn quickly.
+            </p>
+          </div>
+          <Link href="/experiments/new">
+            <button className="btn-primary">
+              New Experiment
+            </button>
+          </Link>
+        </div>
+
+
+        {/* Empty State */}
         <div className="mb-8">
   <div className="mb-4">
     <BackButton />
@@ -168,6 +194,11 @@ export default function ExperimentsPage() {
           No experiments yet
         </h3>
 
+            <Link href="/experiments/new">
+              <button className="btn-primary">
+                Create Experiment
+              </button>
+            </Link>
         <p className="text-slate-500 text-sm leading-relaxed mb-7">
           Start your first experiment to test and validate ideas.
         </p>
@@ -181,6 +212,7 @@ export default function ExperimentsPage() {
   </div>
 ) : (
 
+          /* Experiments Grid */
           <div className="grid gap-6 md:grid-cols-2">
             {experiments.map((exp) => (
               <div key={exp.id} className="card">
@@ -193,6 +225,9 @@ export default function ExperimentsPage() {
                 </p>
 
                 <div className="flex justify-between items-center mb-2">
+
+                  <span className={`text-sm font-medium ${getStatusTextColor(exp.status)}`}>
+                    Status: {exp.status}
                   <span
                     className={`text-sm font-medium ${getStatusTextColor(
                       exp.status

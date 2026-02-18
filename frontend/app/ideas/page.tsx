@@ -1,8 +1,5 @@
 "use client";
 
-import LoadingState from "../components/LoadingState";
-import ErrorState from "../components/ErrorState";
-import { PageLayout } from "../community/PageLayout";
 import { useEffect, useState } from "react";
 import { apiFetch } from "../lib/api";
 import BackButton from "../components/BackButton";
@@ -11,6 +8,10 @@ import { useRouter } from "next/navigation";
 import TrashIcon from "@/components/ui/trash-icon";
 import Button from "@/app/components/ui/Button";
 import { MagicCard } from "@/components/ui/magic-card";
+import { Search, Filter } from "lucide-react";
+import { PageLayout } from "../community/PageLayout";
+import LoadingState from "../components/LoadingState";
+import ErrorState from "../components/ErrorState";
 
 interface Idea {
   id: number;
@@ -26,6 +27,10 @@ export default function IdeasPage() {
   const [deleteIdea, setDeleteIdea] = useState<Idea | null>(null);
   const [deleting, setDeleting] = useState(false);
   const router = useRouter();
+
+  // Search and Filter State
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
 
   useEffect(() => {
     const fetchIdeas = async () => {
@@ -44,6 +49,13 @@ export default function IdeasPage() {
     fetchIdeas();
   }, []);
 
+  const filteredIdeas = ideas.filter((idea) => {
+    const matchesSearch =
+      idea.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      idea.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === "All" || idea.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
   /* close modal on ESC */
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -124,10 +136,47 @@ export default function IdeasPage() {
             </div>
           </div>
 
+          <p className="text-lg  max-w-2xl text-black dark:text-white mb-8">
           <p className="text-lg max-w-2xl text-black dark:text-white">
             Ideas are the starting point of learning. Communities can share ideas,
             explore them through experiments, and reflect on outcomes.
           </p>
+
+          {/* Search and Filter */}
+          <div className="flex flex-col md:flex-row gap-4 mb-8">
+            <div className="relative flex-1">
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                size={20}
+              />
+              <input
+                type="text"
+                placeholder="Search ideas..."
+                className="w-full pl-10 pr-4 py-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white focus:ring-2 focus:ring-blue-500"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <Filter
+                  size={20}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
+                />
+                <select
+                  className="pl-10 pr-8 py-2 border rounded-lg appearance-none bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-white focus:ring-2 focus:ring-blue-500"
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                >
+                  <option value="All">All Status</option>
+                  <option value="New">New</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Implemented">Implemented</option>
+                  <option value="Discarded">Discarded</option>
+                </select>
+              </div>
+            </div>
+          </div>
         </div>
 
         {ideas.length === 0 ? (
@@ -154,32 +203,50 @@ export default function IdeasPage() {
               </div>
             </MagicCard>
           </div>
+        ) : filteredIdeas.length === 0 ? (
+          /* Empty State - No matches */
+          <div className="text-center py-12">
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-3">
+              No matching ideas found
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400">
+              Try adjusting your search or filter.
+            </p>
+            <button
+              onClick={() => {
+                setSearchQuery("");
+                setStatusFilter("All");
+              }}
+              className="mt-4 text-blue-600 hover:underline dark:text-blue-400"
+            >
+              Clear filters
+            </button>
+          </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {ideas.map((idea) => (
+            {filteredIdeas.map((idea) => (
               <MagicCard
                 key={idea.id}
                 className="p-[1px] rounded-xl relative group"
                 gradientColor="rgba(59,130,246,0.6)"
               >
-                <div className="relative p-5 bg-white/10 dark:bg-slate-900/40 backdrop-blur-xl rounded-xl border border-white/10">
-                  
+                <div className="relative p-5 bg-white/10 dark:bg-slate-900/40 backdrop-blur-xl rounded-xl border border-white/10 h-full flex flex-col">
                   <button
                     onClick={() => setDeleteIdea(idea)}
-                    className="absolute top-5 right-5 p-2 text-red-400 hover:text-red-600"
+                    className="absolute top-5 right-5 p-2 text-red-400 hover:text-red-600 z-10"
                   >
                     <TrashIcon className="w-6 h-6" />
                   </button>
 
-                  <h3 className="text-xl font-semibold text-black dark:text-white mb-2">
+                  <h3 className="text-xl font-semibold text-black dark:text-white mb-2 pr-8">
                     {idea.title}
                   </h3>
 
-                  <p className="text-slate-600 dark:text-slate-100 text-sm mb-4">
+                  <p className="text-slate-600 dark:text-slate-100 text-sm mb-4 flex-grow">
                     {idea.description}
                   </p>
 
-                  <div className="text-sm text-gray-400">
+                  <div className="text-sm text-gray-400 mt-auto pt-4 border-t border-white/10">
                     Status: {idea.status}
                   </div>
                 </div>
@@ -190,6 +257,21 @@ export default function IdeasPage() {
       </div>
 
       {deleteIdea && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <MagicCard
+            className="p-[1px] rounded-2xl"
+            gradientColor="rgba(59,130,246,0.6)"
+          >
+            <div className="bg-white/10 dark:bg-slate-900/50 backdrop-blur-xl rounded-2xl px-7 py-7 w-[380px]">
+              <div className="mb-6">
+                <h2 className="text-xl font-bold text-black dark:text-white">
+                  Delete Idea
+                </h2>
+
+                <p className="text-slate-600 dark:text-slate-200 text-sm mt-2 leading-relaxed">
+                  "{deleteIdea.title}" will be permanently removed.
+                </p>
+              </div>
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
           onClick={() => !deleting && setDeleteIdea(null)}
@@ -206,6 +288,31 @@ export default function IdeasPage() {
                     Delete Idea
                   </h2>
 
+                <Button
+                  variant="primary"
+                  className="w-full"
+                  onClick={async () => {
+                    try {
+                      const res = await fetch(
+                        `http://localhost:5000/ideas/${deleteIdea.id}`,
+                        { method: "DELETE" }
+                      );
+
+                      const data = await res.json();
+
+                      if (!res.ok || !data.success) {
+                        throw new Error(data.message || "Delete failed");
+                      }
+
+                      setIdeas((prev) => prev.filter((i) => i.id !== deleteIdea.id));
+                      setDeleteIdea(null);
+                    } catch (err: any) {
+                      alert(err.message || "Failed to delete idea");
+                    }
+                  }}
+                >
+                  Delete
+                </Button>
                   <p className="text-slate-600 dark:text-slate-200 text-sm mt-2 leading-relaxed">
                     "{deleteIdea.title}" will be permanently removed.
                   </p>
