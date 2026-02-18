@@ -1,5 +1,6 @@
 import "../styles/globals.css";
 import { ThemeProvider } from "./components/ThemeProvider";
+import { GlobalNavbar } from "./components/GlobalNavbar";
 
 export const metadata = {
   title: "EchoRoom",
@@ -15,6 +16,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white transition-colors">
         <ThemeProvider>
+          <GlobalNavbar />
           {children}
         </ThemeProvider>
       </body>

@@ -2,29 +2,20 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useTheme } from "./components/ThemeProvider";
 import Button from "./components/ui/Button";
 import BulbSvg from "@/components/ui/bulb-svg";
 import QuestionMark from "@/components/ui/question-mark";
 import LibraryIcon from "@/components/ui/library-icon";
 import ChartHistogramIcon from "@/components/ui/chart-histogram-icon";
-import BrightnessDownIcon from "@/components/ui/brightness-down-icon";
-import MoonIcon from "@/components/ui/moon-icon";
-import RadioIcon from "@/components/ui/radio-icon";
 import { Ripple } from "@/components/ui/ripple";
 import { MorphingText } from "@/components/ui/morphing-text"
 import { TypingAnimation } from "@/components/ui/typing-animation"
 import WifiIcon from "@/components/ui/wifi-icon";
 import WifiOffIcon from "@/components/ui/wifi-off-icon";
-import { Dock, DockIcon } from "@/components/ui/dock";
-import { useRouter } from "next/navigation";
 
 
 export default function HomePage() {
-  const { dark, toggleTheme } = useTheme();
   const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
-
-  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
   fetch("http://localhost:5000/health")
@@ -40,110 +31,6 @@ export default function HomePage() {
 return (
 
     <main className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors">
-      {/* NAVBAR */}
-      {/* NAVBAR */}
-<nav className="sticky top-0 z-50 backdrop-blur-lg bg-white/70 dark:bg-slate-900/70 border-b border-slate-200 dark:border-slate-800">
-
-  <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-
-    {/* Logo */}
-   <div className="flex items-center gap-2 text-2xl font-extrabold">
-  <RadioIcon
-    className={`w-6 h-6 ${
-      dark ? "text-white" : "text-slate-800"
-    }`}
-  />
-
-  <span
-  className={`
-    ${dark ? "text-white" : "text-slate-900"}
-    transition-colors
-    hover:text-blue-500
-  `}
->
-  EchoRoom
-</span>
-
-</div>
-
-
-
-    {/* Navigation Links */}
-    <div className="hidden md:flex items-center">
-  <NavbarDock dark={dark} />
-</div>
-
-
-    {/* Right side */}
-    <div className="flex items-center gap-4">
-
-      {/* Theme Toggle */}
-      <button
-  onClick={toggleTheme}
-  aria-label="Toggle theme"
-  className="
-  flex items-center justify-center
-  w-11 h-11
-  rounded-full
-  transition-all duration-300
-  hover:bg-slate-200
-  dark:hover:bg-slate-800
-  hover:scale-105
-  active:scale-95
-"
-
->
-  {dark ? (
-  <BrightnessDownIcon className="w-5 h-5" />
-) : (
-  <MoonIcon className="w-5 h-5" />
-)}
-
-</button>
-
-
-     {/* Signup Link */}
-    <Link href="/signup">
-  <button
-    className="
-      rounded-full
-      px-5 py-2.5
-      text-sm
-      font-normal
-      tracking-tight
-      text-white
-
-      bg-gradient-to-r from-blue-500 to-[#9CCFFF]
-      
-      
-      
-      transition-all duration-300
-      
-      hover:scale-[1.05]
-      
-      hover:from-blue-400 hover:to-indigo-500
-
-      active:scale-[0.96]
-    "
-  >
-    Sign Up
-  </button>
-</Link>
-
-
-      {/* Login Link */}
-      <Link
-        href="/login"
-        className="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition font-medium"
-      >
-        Login
-      </Link>
-
-    </div>
-
-  </div>
-
-</nav>
 
 
 {/* HERO */}
@@ -262,6 +149,7 @@ return (
 >
   Learn More
 </Button>
+
 
 
 </Link>
@@ -396,55 +284,5 @@ function FeatureCard({
       </p>
 
     </div>
-  );
-}
-
-
- function NavbarDock({ dark }: { dark: boolean }) {
-  const router = useRouter();
-
-  const iconColor = dark ? "text-blue-300" : "text-blue-700";
-
-  return (
-    <Dock
-      direction="middle"
-      className="bg-transparent border-none shadow-none"
-    >
-      {/* IDEAS */}
-      <DockIcon
-        onClick={() => router.push("/ideas")}
-        className="group relative w-12 h-12 flex items-center justify-center"
-      >
-        <BulbSvg className={`w-5 h-5 ${iconColor}`} />
-
-        <span className="pointer-events-none absolute -bottom-8 scale-0 group-hover:scale-100 transition rounded-md bg-black/80 text-white text-xs px-2 py-1">
-          Ideas
-        </span>
-      </DockIcon>
-
-      {/* EXPERIMENTS */}
-      <DockIcon
-        onClick={() => router.push("/experiments")}
-        className="group relative w-12 h-12 flex items-center justify-center"
-      >
-        <ChartHistogramIcon className={`w-5 h-5 ${iconColor}`} />
-
-        <span className="pointer-events-none absolute -bottom-8 scale-0 group-hover:scale-100 transition rounded-md bg-black/80 text-white text-xs px-2 py-1">
-          Experiments
-        </span>
-      </DockIcon>
-
-      {/* REFLECTION */}
-      <DockIcon
-        onClick={() => router.push("/reflection")}
-        className="group relative w-12 h-12 flex items-center justify-center"
-      >
-        <LibraryIcon className={`w-5 h-5 ${iconColor}`} />
-
-        <span className="pointer-events-none absolute -bottom-8 scale-0 group-hover:scale-100 transition rounded-md bg-black/80 text-white text-xs px-2 py-1">
-          Reflection
-        </span>
-      </DockIcon>
-    </Dock>
   );
 }
