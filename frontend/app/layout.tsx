@@ -1,5 +1,4 @@
 import "../styles/globals.css";
-import { GlobalNavbar } from "./components/GlobalNavbar";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { ExperimentsProvider } from "./context/ExperimentsContext";
 import { SmoothCursor } from "@/components/ui/smooth-cursor";
@@ -20,8 +19,7 @@ export default function RootLayout({
         <ThemeProvider>
           <ExperimentsProvider>
             <SmoothCursor />
-            {children}
-            <GlobalNavbar />
+            {children}    
           </ExperimentsProvider>
         </ThemeProvider>
       </body>

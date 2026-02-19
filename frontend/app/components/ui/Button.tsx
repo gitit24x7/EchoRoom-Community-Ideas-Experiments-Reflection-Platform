@@ -1,13 +1,11 @@
 import React from "react";
 
-interface ButtonProps {
-  children: React.ReactNode;
-  onClick?: () => void;
+interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "outline";
   size?: "sm" | "md" | "lg";
-  type?: "button" | "submit" | "reset";
-  className?: string;
 }
+
 
 export default function Button({
   children,

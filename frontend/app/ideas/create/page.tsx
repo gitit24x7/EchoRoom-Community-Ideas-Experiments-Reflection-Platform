@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PageLayout } from "../../community/PageLayout";
-import { Button } from "@/components/ui/button";
+import  Button  from "@/app/components/ui/Button";
 import { RetroGrid } from "@/components/ui/retro-grid";
 import { MagicCard } from "@/components/ui/magic-card";
 
@@ -82,16 +82,7 @@ export default function CreateIdeaPage() {
         <div className="mb-6">
           <Button
   onClick={() => router.push("/ideas")}
-  className="
-    rounded-full
-    px-6 py-2
-    text-sm font-medium
-    bg-gradient-to-br from-[#3A9AFF] via-[#2F7CF6] to-[#0992C2]
-    text-white
-    shadow-[0_8px_20px_rgba(0,0,0,0.25)]
-    hover:-translate-y-0.5 hover:scale-[1.03]
-    transition-all
-  "
+  className="primary"
 >
   ← Back to Ideas
 </Button>
@@ -182,40 +173,26 @@ export default function CreateIdeaPage() {
 {/* Submit — same lift-off style */}
             <div className="flex gap-4">
               <Button
-                type="button"
-                disabled={loading}
-                onClick={handleSaveDraft}
-                className="
-                  flex-1
-                  rounded-full
-                  text-sm font-medium
-                  bg-gray-500 hover:bg-gray-600
-                  text-white
-                  shadow-[0_8px_20px_rgba(0,0,0,0.25)]
-                  hover:-translate-y-0.5 hover:scale-[1.03]
-                  transition-all
-                "
-              >
-                {loading ? "Saving..." : "Save as Draft"}
-              </Button>
+  type="button"
+  variant="primary"
+  onClick={handleSaveDraft}
+  disabled={loading}
+  className="flex-1 rounded-full px-6 py-3 text-base font-normal tracking-tight"
+>
+  {loading ? "Saving..." : "Save as Draft"}
+</Button>
+
 
               <Button
-                type="button"
-                disabled={loading}
-                onClick={handlePublish}
-                className="
-                  flex-1
-                  rounded-full
-                  text-sm font-medium
-                  bg-gradient-to-br from-[#3A9AFF] via-[#2F7CF6] to-[#0992C2]
-                  text-white
-                  shadow-[0_8px_20px_rgba(0,0,0,0.25)]
-                  hover:-translate-y-0.5 hover:scale-[1.03]
-                  transition-all
-                "
-              >
-                {loading ? "Publishing..." : "+ Publish Idea"}
-              </Button>
+  type="button"
+  variant="primary"
+  onClick={handlePublish}
+  disabled={loading}
+  className="flex-1 rounded-full px-6 py-3 text-base font-normal tracking-tight"
+>
+  {loading ? "Publishing..." : "+ Publish Idea"}
+</Button>
+
             </div>
 
 
