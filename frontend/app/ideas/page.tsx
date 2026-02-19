@@ -133,40 +133,64 @@ export default function IdeasPage() {
           </p>
 
           {/* Search and Filter */}
-          <div className="flex flex-col md:flex-row gap-4 mb-8">
-            <div className="relative flex-1">
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                size={20}
-              />
-              <input
-                type="text"
-                placeholder="Search ideas..."
-                className="w-full pl-10 pr-4 py-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white focus:ring-2 focus:ring-blue-500"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="relative">
-                <Filter
-                  size={20}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
-                />
-                <select
-                  className="pl-10 pr-8 py-2 border rounded-lg appearance-none bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-white focus:ring-2 focus:ring-blue-500"
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                  <option value="All">All Status</option>
-                  <option value="New">New</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Implemented">Implemented</option>
-                  <option value="Discarded">Discarded</option>
-                </select>
-              </div>
-            </div>
-          </div>
+          <MagicCard
+  className="p-[1px] rounded-2xl mb-8"
+  gradientColor="rgba(59,130,246,0.6)"
+>
+  <div className="flex flex-col md:flex-row gap-4 p-4 bg-white/10 dark:bg-slate-900/40 backdrop-blur-xl rounded-2xl border border-white/10">
+    
+    {/* Search */}
+    <div className="relative flex-1">
+      <Search
+        className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+        size={18}
+      />
+      <input
+        type="text"
+        placeholder="Search ideas..."
+        className="
+          w-full pl-10 pr-4 py-2.5
+          bg-transparent
+          text-black dark:text-white
+          border border-white/10
+          rounded-xl
+          focus:outline-none focus:ring-2 focus:ring-blue-500
+        "
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+    </div>
+
+    {/* Filter */}
+    <div className="relative">
+      <Filter
+        size={18}
+        className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+      />
+      <select
+        className="
+          pl-10 pr-8 py-2.5
+          bg-transparent
+          text-black dark:text-white
+          border border-white/10
+          rounded-xl
+          appearance-none
+          focus:outline-none focus:ring-2 focus:ring-blue-500
+        "
+        value={statusFilter}
+        onChange={(e) => setStatusFilter(e.target.value)}
+      >
+        <option value="All">All Status</option>
+        <option value="New">New</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Implemented">Implemented</option>
+        <option value="Discarded">Discarded</option>
+      </select>
+    </div>
+
+  </div>
+</MagicCard>
+
         </div>
 
         {ideas.length === 0 ? (
