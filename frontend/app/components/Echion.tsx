@@ -6,12 +6,14 @@ import { TypingAnimation } from "@/components/ui/typing-animation";
 import Button from "@/app/components/ui/Button";
 import { MagicCard } from "@/components/ui/magic-card";
 import { AnimatedGradientText } from "@/components/ui/animated-gradient-text"
+import { useEffect } from "react";
 
 export default function Echion() {
   const [open, setOpen] = useState(false);
   const [response, setResponse] = useState<string | null>(null);
   const [input, setInput] = useState("");
-
+  const [showBubble, setShowBubble] = useState(false);
+  
   const handleUserInput = () => {
     const text = input
       .toLowerCase()
@@ -56,20 +58,71 @@ export default function Echion() {
 
     setResponse(intent ? intent.response : fallbackResponse);
   };
+  useEffect(() => {
+  if (open) return; // stop bubble when chat is open
+
+  const interval = setInterval(() => {
+    setShowBubble(true);
+
+    setTimeout(() => {
+      setShowBubble(false);
+    }, 4000); // visible for 4s
+  }, 8000); // every 8s
+
+  return () => clearInterval(interval);
+}, [open]);
 
   return (
     <>
+    
       {/* Floating Icon */}
       <div
-        onClick={() => setOpen(!open)}
-        className="fixed bottom-6 right-6 z-50 cursor-pointer"
+  onClick={() => setOpen(!open)}
+  className="fixed bottom-6 right-6 z-50 cursor-pointer group"
+>
+    
+  <div className="relative">
+    
+    {showBubble && !open && (
+  <div className="absolute bottom-16 right-14 z-50 animate-in fade-in slide-in-from-bottom-4 slide-in-from-right-4 zoom-in-95 duration-500 ease-out">
+    <div className="
+      relative
+      bg-gradient-to-br from-blue-500 to-blue-600
+      text-white
+      px-5 py-3
+      rounded-2xl
+      shadow-lg shadow-blue-500/30
+      border border-blue-400/20
+      w-max
+      max-w-[200px]
+    ">
+      
+      {/* Cloud Trail: Medium Circle */}
+      <div className="absolute -bottom-2 -right-1 w-3.5 h-3.5 bg-blue-600 rounded-full shadow-sm z-[-1]"></div>
+      
+      {/* Cloud Trail: Smallest Circle (closest to icon) */}
+      <div className="absolute -bottom-4 -right-3 w-2 h-2 bg-blue-600 rounded-full shadow-sm z-[-1]"></div>
+
+      <TypingAnimation 
+        duration={50} 
+        className="relative z-10 text-white text-sm font-medium tracking-wide"
       >
-        <img
-          src="/echion.webp"
-          alt="Echion Assistant"
-          className="w-14 h-14 drop-shadow-lg hover:scale-105 transition-transform duration-200"
-        />
-      </div>
+        Hi 👋 I’m Echion
+      </TypingAnimation>
+    </div>
+  </div>
+)}
+    {/* Glow ring */}
+    <div className="absolute inset-0 rounded-full bg-blue-500/30 blur-xl animate-pulse"></div>
+
+    {/* Breathing animation */}
+    <img
+      src="/echion.webp"
+      alt="Echion Assistant"
+      className="relative w-14 h-14 drop-shadow-lg animate-breathe group-hover:scale-110 transition-transform duration-300"
+    />
+  </div>
+</div>
 
       {/* Assistant Panel */}
       {open && (
