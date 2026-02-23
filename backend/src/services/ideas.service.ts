@@ -7,6 +7,7 @@ export interface Idea {
   title: string;
   description: string;
   status: IdeaStatus;
+  version: number;
   createdAt: string;
   updatedAt: string;
 }
