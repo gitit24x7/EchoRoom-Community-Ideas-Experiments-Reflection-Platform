@@ -69,7 +69,7 @@ export const postDraft = (req: Request, res: Response): void => {
 
 export const putDraft = (req: Request, res: Response): void => {
   const id = Number(req.params.id);
-  const { title, description, version} = req.body;
+  const { title, description, version } = req.body;
 
   if (Number.isNaN(id)) {
     res.status(400).json({
@@ -114,7 +114,7 @@ export const putDraft = (req: Request, res: Response): void => {
 
 export const publishDraftHandler = (req: Request, res: Response): void => {
   const id = Number(req.params.id);
-
+  const { version } = req.body;
   if (Number.isNaN(id)) {
     res.status(400).json({
       success: false,
@@ -122,10 +122,17 @@ export const publishDraftHandler = (req: Request, res: Response): void => {
     });
     return;
   }
+  if (typeof version !== "number") {
+    res.status(400).json({
+      success: false,
+      message: "Version is required",
+    });
+    return;
+  }
+
 
   try {
-    const idea = publishDraft(id);
-
+    const idea = publishDraft(id, version);
     if (!idea) {
       res.status(404).json({
         success: false,
@@ -215,7 +222,7 @@ export const deleteIdeaById = (req: Request, res: Response): void => {
   const id = Number(req.params.id);
 
   console.log("DELETE request for ID:", id);
-  
+
 
   if (Number.isNaN(id)) {
     res.status(400).json({
@@ -265,8 +272,8 @@ export const getIdeaByIdHandler = (req: Request, res: Response): void => {
   }
 
   res.json({
-  success: true,
-  idea,
-});
+    success: true,
+    idea,
+  });
 
 };
