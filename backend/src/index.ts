@@ -3,12 +3,7 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import "dotenv/config";
 
-import ideasRoutes from "./routes/ideas.routes";
-import experimentsRoutes from "./routes/experiments.routes";
-import outcomesRoutes from "./routes/outcomes.routes";
-import reflectionsRoutes from "./routes/reflections.routes";
-import authRoutes from "./routes/auth.routes";
-import insightsRoutes from "./routes/insights.routes";
+
 
 // import prisma from "./lib/prisma";
 console.log("INDEX TS SERVER STARTED");
@@ -22,12 +17,7 @@ app.get("/health", (_req: Request, res: Response) => {
   res.json({ success: true, message: "Backend is running" });
 });
 
-app.use("/auth", authRoutes);
-app.use("/ideas", ideasRoutes);
-app.use("/experiments", experimentsRoutes);
-app.use("/outcomes", outcomesRoutes);
-app.use("/reflections", reflectionsRoutes);
-app.use("/insights", insightsRoutes);
+
 
 app.use((err: any, _req: Request, res: Response, _next: any) => {
   console.error("Unhandled error:", err);
