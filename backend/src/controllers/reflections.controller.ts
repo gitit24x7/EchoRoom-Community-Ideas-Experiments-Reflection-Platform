@@ -25,13 +25,13 @@ export const postReflection = (
 
     // Basic required validation
     if (
-  outcomeId === undefined ||
-  !context ||
-  !breakdown ||
-  !growth ||
-  !result ||
-  !visibility
-) {
+      outcomeId === undefined ||
+      !context ||
+      !breakdown ||
+      !growth ||
+      !result ||
+      !visibility
+    ) {
       res.status(400).json({
         success: false,
         message: "Missing required reflection fields",
@@ -62,6 +62,7 @@ export const postReflection = (
       !breakdown.whatHappened?.trim() ||
       !breakdown.whatWorked?.trim() ||
       !breakdown.whatDidntWork?.trim() ||
+      !breakdown.surprises?.trim() ||
       !growth.lessonLearned?.trim() ||
       !growth.nextAction?.trim()
     ) {
@@ -170,4 +171,4 @@ export const getReflectionByIdController = (
   } catch (error) {
     next(error);
   }
-}; 
+};

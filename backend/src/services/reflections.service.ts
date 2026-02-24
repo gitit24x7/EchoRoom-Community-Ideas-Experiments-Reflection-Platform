@@ -13,6 +13,7 @@ export interface Reflection {
     whatHappened: string;
     whatWorked: string;
     whatDidntWork: string;
+    surprises: string;
   };
 
   growth: {
@@ -49,6 +50,7 @@ export interface ReflectionInput {
     whatHappened: string;
     whatWorked: string;
     whatDidntWork: string;
+    surprises: string;
   };
 
   growth: {
@@ -70,7 +72,6 @@ export interface ReflectionInput {
 export const createReflection = (
   data: ReflectionInput
 ): Reflection => {
-
   const newReflection: Reflection = {
     id: nextId++,
     outcomeId: data.outcomeId,

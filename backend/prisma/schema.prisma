@@ -73,7 +73,12 @@ model Outcome {
 }
 
 model Reflection {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  content   String
-  createdAt DateTime @default(now())
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  outcomeId    String   @db.ObjectId
+  content      String   // Generic summary
+  whatWentWell String
+  challenges   String
+  surprises    String
+  nextSteps    String
+  createdAt    DateTime @default(now())
 }

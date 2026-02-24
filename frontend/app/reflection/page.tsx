@@ -18,6 +18,10 @@ interface Reflection {
   title: string;
   outcome: string;
   learning: string;
+  whatWentWell: string;
+  challenges: string;
+  surprises: string;
+  nextSteps: string;
   author: string;
   date: string;
 }
@@ -26,6 +30,10 @@ interface ReflectionApiResponse {
   id: number;
   outcomeId: number;
   content: string;
+  whatWentWell: string;
+  challenges: string;
+  surprises: string;
+  nextSteps: string;
   createdAt: string;
 }
 
@@ -69,6 +77,10 @@ const mapReflectionToViewModel = (
     title: outcome?.experimentTitle || "Unknown Experiment",
     outcome: outcome?.result || "Unknown",
     learning: reflection.content || "No reflection content",
+    whatWentWell: reflection.whatWentWell || "",
+    challenges: reflection.challenges || "",
+    surprises: reflection.surprises || "",
+    nextSteps: reflection.nextSteps || "",
     author: "Community member",
     date: formatReflectionDate(reflection.createdAt),
   };
@@ -183,46 +195,56 @@ export default function ReflectionPage() {
           <div className="space-y-6">
             {reflections.map((ref) => (
               <div
-  key={ref.id}
-  className="cursor-pointer hover:scale-[1.02] transition"
->
-  <MagicCard
-    className="p-[1px] rounded-xl"
-    gradientColor="rgba(59,130,246,0.6)"
-  >
-    <div className="p-6 bg-white/10 dark:bg-slate-900/40 backdrop-blur-xl rounded-xl border border-white/10">
+                key={ref.id}
+                className="cursor-pointer hover:scale-[1.02] transition"
+              >
+                <MagicCard
+                  className="p-[1px] rounded-xl"
+                  gradientColor="rgba(59,130,246,0.6)"
+                >
+                  <div className="p-6 bg-white/10 dark:bg-slate-900/40 backdrop-blur-xl rounded-xl border border-white/10">
 
-      <div className="flex items-start justify-between mb-3">
-        <h3 className="text-xl font-semibold text-black dark:text-white">
-          {ref.title}
-        </h3>
+                    <div className="flex items-start justify-between mb-3">
+                      <h3 className="text-xl font-semibold text-black dark:text-white">
+                        {ref.title}
+                      </h3>
 
-        <span
-          className={`text-xs font-medium px-3 py-1 rounded-full ${
-            outcomeColors[ref.outcome] || ""
-          }`}
-        >
-          {ref.outcome}
-        </span>
-      </div>
+                      <span
+                        className={`text-xs font-medium px-3 py-1 rounded-full ${outcomeColors[ref.outcome] || ""
+                          }`}
+                      >
+                        {ref.outcome}
+                      </span>
+                    </div>
 
-      <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded-r-lg p-4 mb-4">
-        <div className="flex items-start gap-2">
-          <MessageSquare className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" />
-          <p className="text-sm italic">
-            "{ref.learning}"
-          </p>
-        </div>
-      </div>
+                    {/* Structured Sections */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div className="bg-emerald-50 dark:bg-emerald-950/20 border-l-4 border-emerald-500 rounded-r-lg p-3">
+                        <h4 className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400 mb-1">What went well</h4>
+                        <p className="text-sm line-clamp-2">{ref.whatWentWell}</p>
+                      </div>
+                      <div className="bg-rose-50 dark:bg-rose-950/20 border-l-4 border-rose-500 rounded-r-lg p-3">
+                        <h4 className="text-[10px] uppercase font-bold text-rose-600 dark:text-rose-400 mb-1">Challenges</h4>
+                        <p className="text-sm line-clamp-2">{ref.challenges}</p>
+                      </div>
+                      <div className="bg-amber-50 dark:bg-amber-950/20 border-l-4 border-amber-500 rounded-r-lg p-3">
+                        <h4 className="text-[10px] uppercase font-bold text-amber-600 dark:text-amber-400 mb-1">Surprises</h4>
+                        <p className="text-sm line-clamp-2">{ref.surprises}</p>
+                      </div>
+                      <div className="bg-blue-50 dark:bg-blue-950/20 border-l-4 border-blue-500 rounded-r-lg p-3">
+                        <h4 className="text-[10px] uppercase font-bold text-blue-600 dark:text-blue-400 mb-1">Next Steps</h4>
+                        <p className="text-sm line-clamp-2">{ref.nextSteps}</p>
+                      </div>
+                    </div>
 
-      <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-        <span>By {ref.author}</span>
-        <span>{ref.date}</span>
-      </div>
+                    <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                      <span>By {ref.author}</span>
+                      <span>{ref.date}</span>
+                    </div>
 
-    </div>
-  </MagicCard>
-</div>
+                  </div>
+                </MagicCard>
+              </div>
             ))}
           </div>
         )}
