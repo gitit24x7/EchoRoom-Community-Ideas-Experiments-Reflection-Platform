@@ -3,7 +3,11 @@
 export interface Reflection {
   id: number;
   outcomeId: number;
-  content: string;
+  content: string; // Keep for legacy/fallback
+  whatWentWell: string;
+  challenges: string;
+  surprises: string;
+  nextSteps: string;
   createdAt: Date;
 }
 
@@ -16,13 +20,20 @@ let nextId = 1;
 // Create reflection
 export const createReflection = (
   outcomeId: number,
-  content: string
+  content: string,
+  whatWentWell: string,
+  challenges: string,
+  surprises: string,
+  nextSteps: string
 ): Reflection => {
-
   const newReflection: Reflection = {
     id: nextId++,
     outcomeId,
     content,
+    whatWentWell,
+    challenges,
+    surprises,
+    nextSteps,
     createdAt: new Date(),
   };
 

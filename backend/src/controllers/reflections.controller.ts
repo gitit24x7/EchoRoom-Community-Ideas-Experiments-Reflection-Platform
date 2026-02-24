@@ -11,17 +11,24 @@ export const postReflection = (
   next: NextFunction
 ): void => {
   try {
-    const { outcomeId, content } = req.body;
+    const { outcomeId, content, whatWentWell, challenges, surprises, nextSteps } = req.body;
 
-    if (!outcomeId || !content) {
+    if (!outcomeId || !content || !whatWentWell || !challenges || !surprises || !nextSteps) {
       res.status(400).json({
         success: false,
-        message: "outcomeId and content are required",
+        message: "outcomeId, content, and all structured fields are required",
       });
       return;
     }
 
-    const reflection = createReflection(Number(outcomeId), String(content));
+    const reflection = createReflection(
+      Number(outcomeId),
+      String(content),
+      String(whatWentWell),
+      String(challenges),
+      String(surprises),
+      String(nextSteps)
+    );
 
     res.status(201).json({
       success: true,
