@@ -17,6 +17,7 @@ export interface Idea {
   status: IdeaStatus;
   complexity: IdeaComplexity;
   version: number;
+  upvotes: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -75,6 +76,7 @@ export const createIdea = (
     status: "proposed",
     complexity,
     version: 1,
+    upvotes: 0,
     createdAt: now,
     updatedAt: now,
   };
@@ -98,6 +100,7 @@ export const createDraft = (
     status: "draft",
     complexity,
     version: 1,
+    upvotes: 0,
     createdAt: now,
     updatedAt: now,
   };
@@ -153,6 +156,16 @@ export const updateIdeaStatus = (
   idea.version += 1;
   idea.updatedAt = new Date().toISOString();
 
+  return idea;
+};
+
+// 🔹 Upvote idea
+export const upvoteIdea = (id: number): Idea | null => {
+  const idea = ideas.find((i) => i.id === id);
+  if (!idea) return null;
+
+  idea.upvotes += 1;
+  idea.updatedAt = new Date().toISOString();
   return idea;
 };
 

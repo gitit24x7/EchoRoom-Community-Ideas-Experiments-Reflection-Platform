@@ -9,7 +9,8 @@ import {
   publishDraftHandler,
   patchIdeaStatus,
   deleteIdeaById,
-  getIdeaByIdHandler
+  getIdeaByIdHandler,
+  upvoteIdeaHandler
 } from "../controllers/ideas.controller";
 
 const router = Router();
@@ -24,6 +25,7 @@ router.patch("/:id/publish", publishDraftHandler);
 router.patch("/:id/status", patchIdeaStatus);
 router.delete("/:id", deleteIdeaById);
 router.get("/:id", getIdeaByIdHandler);
+router.post("/:id/upvote", upvoteIdeaHandler);
 
 
 export default router;

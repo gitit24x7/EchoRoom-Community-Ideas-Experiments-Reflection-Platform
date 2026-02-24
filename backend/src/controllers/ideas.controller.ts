@@ -11,6 +11,7 @@ import {
   IdeaStatus,
   updateIdeaStatus,
   deleteIdea,
+  upvoteIdea,
 } from "../services/ideas.service";
 
 function isValidString(value: unknown): value is string {
@@ -249,4 +250,22 @@ export const deleteIdeaById = (
   }
 
   res.json({ success: true, message: "Idea deleted" });
+};
+
+export const upvoteIdeaHandler = (req: Request, res: Response): void => {
+  const id = Number(req.params.id);
+
+  if (Number.isNaN(id)) {
+    res.status(400).json({ success: false, message: "Invalid idea ID" });
+    return;
+  }
+
+  const idea = upvoteIdea(id);
+
+  if (!idea) {
+    res.status(404).json({ success: false, message: "Idea not found" });
+    return;
+  }
+
+  res.json({ success: true, idea });
 };

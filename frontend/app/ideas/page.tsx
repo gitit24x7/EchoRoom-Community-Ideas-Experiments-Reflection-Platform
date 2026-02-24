@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import TrashIcon from "@/components/ui/trash-icon";
 import Button from "@/app/components/ui/Button";
 import { MagicCard } from "@/components/ui/magic-card";
-import { Check, Facebook, Filter, Link2, Linkedin, MessageCircle, Twitter } from "lucide-react";
+import { ArrowBigUp, Check, Facebook, Filter, Link2, Linkedin, MessageCircle, TrendingUp, Twitter, Clock } from "lucide-react";
 import { PageLayout } from "../community/PageLayout";
 import LoadingState from "../components/LoadingState";
 import ErrorState from "../components/ErrorState";
@@ -20,6 +20,8 @@ interface Idea {
   description: string;
   status: string;
   complexity: "LOW" | "MEDIUM" | "HIGH";
+  upvotes: number;
+  createdAt: string;
 }
 
 const STATUS_OPTIONS = [
@@ -67,9 +69,23 @@ export default function IdeasPage() {
     window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, "_blank");
   };
 
-  // Search and Filter State
+  // Search, Filter, and Sort State
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [sortBy, setSortBy] = useState<"latest" | "votes">("latest");
+
+  const handleUpvote = async (id: number) => {
+    try {
+      const updatedIdea = await apiFetch<Idea>(`/ideas/${id}/upvote`, {
+        method: "POST",
+      });
+      setIdeas((prev) =>
+        prev.map((i) => (i.id === id ? { ...i, upvotes: updatedIdea.upvotes } : i))
+      );
+    } catch (err: any) {
+      console.error("Failed to upvote:", err.message);
+    }
+  };
 
   useEffect(() => {
     const fetchIdeas = async () => {
@@ -94,6 +110,11 @@ export default function IdeasPage() {
       idea.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "All" || idea.status === statusFilter;
     return matchesSearch && matchesStatus;
+  });
+
+  const sortedIdeas = [...filteredIdeas].sort((a, b) => {
+    if (sortBy === "votes") return b.upvotes - a.upvotes;
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 
   useEffect(() => {
@@ -159,6 +180,22 @@ export default function IdeasPage() {
             </div>
 
             <div className="flex gap-3">
+              <div className="flex bg-gray-100 dark:bg-zinc-800 p-1 rounded-full border border-gray-200 dark:border-zinc-700">
+                <button
+                  onClick={() => setSortBy("latest")}
+                  className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium transition ${sortBy === "latest" ? "bg-white dark:bg-zinc-700 shadow-sm text-blue-600 dark:text-blue-400" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
+                >
+                  <Clock size={14} />
+                  Latest
+                </button>
+                <button
+                  onClick={() => setSortBy("votes")}
+                  className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium transition ${sortBy === "votes" ? "bg-white dark:bg-zinc-700 shadow-sm text-blue-600 dark:text-blue-400" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
+                >
+                  <TrendingUp size={14} />
+                  Top Voted
+                </button>
+              </div>
               <Button
                 onClick={() => router.push("/ideas/drafts")}
                 className="rounded-full bg-gray-500 hover:bg-gray-600 text-white"
@@ -233,13 +270,26 @@ export default function IdeasPage() {
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredIdeas.map((idea) => (
+            {sortedIdeas.map((idea) => (
               <MagicCard
                 key={idea.id}
                 className="p-[1px] rounded-xl relative group"
                 gradientColor="rgba(59,130,246,0.6)"
               >
                 <div className="relative p-5 bg-white/10 dark:bg-slate-900/40 backdrop-blur-xl rounded-xl border border-white/10 h-full flex flex-col">
+                  {/* Upvote Button */}
+                  <div className="absolute -left-3 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 z-20">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleUpvote(idea.id); }}
+                      className="group/vote flex flex-col items-center justify-center w-10 h-14 bg-white dark:bg-zinc-900 rounded-xl shadow-lg border border-gray-200 dark:border-zinc-700 hover:border-blue-500 dark:hover:border-blue-400 transition-all active:scale-95"
+                    >
+                      <ArrowBigUp className="w-6 h-6 text-gray-400 group-hover/vote:text-blue-500 transition-colors" />
+                      <span className="text-xs font-bold text-gray-600 dark:text-gray-300 group-hover/vote:text-blue-500">
+                        {idea.upvotes || 0}
+                      </span>
+                    </button>
+                  </div>
+
                   <div className="absolute top-5 right-5 flex items-center gap-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={(e) => { e.stopPropagation(); handleCopyLink(idea.id); }}
