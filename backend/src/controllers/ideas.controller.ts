@@ -10,10 +10,8 @@ import {
   getIdeaById,
   IdeaStatus,
   updateIdeaStatus,
-  deleteIdea
+  deleteIdea,
 } from "../services/ideas.service";
-
-
 
 function isValidString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
@@ -25,32 +23,47 @@ function isValidStatus(status: unknown): status is IdeaStatus {
   );
 }
 
+function isValidComplexity(
+  complexity: unknown
+): complexity is "LOW" | "MEDIUM" | "HIGH" {
+  return ["LOW", "MEDIUM", "HIGH"].includes(String(complexity));
+}
+
 export const getIdeas = (_req: Request, res: Response): void => {
   const ideas = getPublishedIdeas();
-  res.json({
-    success: true,
-    ideas,
-  });
+  res.json({ success: true, ideas });
 };
 
 export const getAllIdeasHandler = (_req: Request, res: Response): void => {
   const ideas = getAllIdeas();
-  res.json({
-    success: true,
-    ideas,
-  });
+  res.json({ success: true, ideas });
 };
 
 export const getDrafts = (_req: Request, res: Response): void => {
   const drafts = getDraftIdeas();
-  res.json({
-    success: true,
-    ideas: drafts,
-  });
+  res.json({ success: true, ideas: drafts });
+};
+
+export const getIdeaByIdHandler = (req: Request, res: Response): void => {
+  const id = Number(req.params.id);
+
+  if (Number.isNaN(id)) {
+    res.status(400).json({ success: false, message: "Invalid idea ID" });
+    return;
+  }
+
+  const idea = getIdeaById(id);
+
+  if (!idea) {
+    res.status(404).json({ success: false, message: "Idea not found" });
+    return;
+  }
+
+  res.json({ success: true, idea });
 };
 
 export const postDraft = (req: Request, res: Response): void => {
-  const { title, description } = req.body;
+  const { title, description, complexity } = req.body;
 
   if (!isValidString(title) || !isValidString(description)) {
     res.status(400).json({
@@ -60,11 +73,16 @@ export const postDraft = (req: Request, res: Response): void => {
     return;
   }
 
-  const draft = createDraft(title, description);
-  res.status(201).json({
-    success: true,
-    idea: draft,
-  });
+  if (complexity && !isValidComplexity(complexity)) {
+    res.status(400).json({
+      success: false,
+      message: "Invalid complexity value",
+    });
+    return;
+  }
+
+  const draft = createDraft(title, description, complexity);
+  res.status(201).json({ success: true, idea: draft });
 };
 
 export const putDraft = (req: Request, res: Response): void => {
@@ -72,10 +90,7 @@ export const putDraft = (req: Request, res: Response): void => {
   const { title, description, version } = req.body;
 
   if (Number.isNaN(id)) {
-    res.status(400).json({
-      success: false,
-      message: "Invalid idea ID",
-    });
+    res.status(400).json({ success: false, message: "Invalid idea ID" });
     return;
   }
 
@@ -87,41 +102,6 @@ export const putDraft = (req: Request, res: Response): void => {
     return;
   }
 
-  try {
-    const draft = updateDraft(id, title, description, version);
-
-    if (!draft) {
-      res.status(404).json({
-        success: false,
-        message: "Draft not found",
-      });
-      return;
-    }
-
-    res.json({
-      success: true,
-      idea: draft,
-    });
-  } catch (error: unknown) {
-    const message =
-      error instanceof Error ? error.message : "Internal server error";
-    res.status(400).json({
-      success: false,
-      message,
-    });
-  }
-};
-
-export const publishDraftHandler = (req: Request, res: Response): void => {
-  const id = Number(req.params.id);
-  const { version } = req.body;
-  if (Number.isNaN(id)) {
-    res.status(400).json({
-      success: false,
-      message: "Invalid idea ID",
-    });
-    return;
-  }
   if (typeof version !== "number") {
     res.status(400).json({
       success: false,
@@ -130,33 +110,62 @@ export const publishDraftHandler = (req: Request, res: Response): void => {
     return;
   }
 
-
   try {
-    const idea = publishDraft(id, version);
-    if (!idea) {
-      res.status(404).json({
-        success: false,
-        message: "Draft not found",
-      });
+    const draft = updateDraft(id, title, description, version);
+
+    if (!draft) {
+      res.status(404).json({ success: false, message: "Draft not found" });
       return;
     }
 
-    res.json({
-      success: true,
-      idea,
-    });
+    res.json({ success: true, idea: draft });
   } catch (error: unknown) {
     const message =
       error instanceof Error ? error.message : "Internal server error";
+
+    res.status(409).json({ success: false, message });
+  }
+};
+
+export const publishDraftHandler = (
+  req: Request,
+  res: Response
+): void => {
+  const id = Number(req.params.id);
+  const { version } = req.body;
+
+  if (Number.isNaN(id)) {
+    res.status(400).json({ success: false, message: "Invalid idea ID" });
+    return;
+  }
+
+  if (typeof version !== "number") {
     res.status(400).json({
       success: false,
-      message,
+      message: "Version is required",
     });
+    return;
+  }
+
+  try {
+    const idea = publishDraft(id, version);
+
+    if (!idea) {
+      res.status(404).json({ success: false, message: "Draft not found" });
+      return;
+    }
+
+    res.json({ success: true, idea });
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Internal server error";
+
+    res.status(409).json({ success: false, message });
   }
 };
 
 export const postIdea = (req: Request, res: Response): void => {
-  const { title, description } = req.body;
+  const { title, description, complexity } = req.body;
 
   if (!isValidString(title) || !isValidString(description)) {
     res.status(400).json({
@@ -166,22 +175,27 @@ export const postIdea = (req: Request, res: Response): void => {
     return;
   }
 
-  const idea = createIdea(title, description);
-  res.status(201).json({
-    success: true,
-    idea,
-  });
-};
-
-export const patchIdeaStatus = (req: Request, res: Response): void => {
-  const id = Number(req.params.id);
-  const { status } = req.body;
-
-  if (Number.isNaN(id)) {
+  if (complexity && !isValidComplexity(complexity)) {
     res.status(400).json({
       success: false,
-      message: "Invalid idea ID",
+      message: "Invalid complexity value",
     });
+    return;
+  }
+
+  const idea = createIdea(title, description, complexity);
+  res.status(201).json({ success: true, idea });
+};
+
+export const patchIdeaStatus = (
+  req: Request,
+  res: Response
+): void => {
+  const id = Number(req.params.id);
+  const { status, version } = req.body;
+
+  if (Number.isNaN(id)) {
+    res.status(400).json({ success: false, message: "Invalid idea ID" });
     return;
   }
 
@@ -193,87 +207,48 @@ export const patchIdeaStatus = (req: Request, res: Response): void => {
     return;
   }
 
+  if (typeof version !== "number") {
+    res.status(400).json({
+      success: false,
+      message: "Version is required",
+    });
+    return;
+  }
+
   try {
-    const idea = updateIdeaStatus(id, status);
+    const idea = updateIdeaStatus(id, status, version);
 
     if (!idea) {
-      res.status(404).json({
-        success: false,
-        message: "Idea not found",
-      });
+      res.status(404).json({ success: false, message: "Idea not found" });
       return;
     }
 
-    res.json({
-      success: true,
-      idea,
-    });
+    res.json({ success: true, idea });
   } catch (error: unknown) {
     const message =
       error instanceof Error ? error.message : "Internal server error";
-    res.status(400).json({
-      success: false,
-      message,
-    });
+
+    res.status(409).json({ success: false, message });
   }
 };
 
-export const deleteIdeaById = (req: Request, res: Response): void => {
+export const deleteIdeaById = (
+  req: Request,
+  res: Response
+): void => {
   const id = Number(req.params.id);
 
-  console.log("DELETE request for ID:", id);
-
-
   if (Number.isNaN(id)) {
-    res.status(400).json({
-      success: false,
-      message: "Invalid idea ID",
-    });
+    res.status(400).json({ success: false, message: "Invalid idea ID" });
     return;
   }
 
   const deleted = deleteIdea(id);
 
-  console.log("Deleted:", deleted);
-  console.log("DELETE HIT:", id);
-
   if (!deleted) {
-    res.status(404).json({
-      success: false,
-      message: "Idea not found",
-    });
+    res.status(404).json({ success: false, message: "Idea not found" });
     return;
   }
 
-  res.json({
-    success: true,
-    message: "Idea deleted",
-  });
-};
-export const getIdeaByIdHandler = (req: Request, res: Response): void => {
-  const id = Number(req.params.id);
-
-  if (Number.isNaN(id)) {
-    res.status(400).json({
-      success: false,
-      message: "Invalid idea ID",
-    });
-    return;
-  }
-
-  const idea = getIdeaById(id);
-
-  if (!idea) {
-    res.status(404).json({
-      success: false,
-      message: "Idea not found",
-    });
-    return;
-  }
-
-  res.json({
-    success: true,
-    idea,
-  });
-
+  res.json({ success: true, message: "Idea deleted" });
 };

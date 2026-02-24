@@ -18,6 +18,7 @@ interface Idea {
   title: string;
   description: string;
   status: string;
+  complexity: "LOW" | "MEDIUM" | "HIGH";
 }
 
 const API_BASE_URL = "http://localhost:5000";
@@ -154,35 +155,45 @@ export default function DraftsPage() {
                 className="cursor-pointer"
                 onClick={() => router.push(`/ideas/drafts/${draft.id}`)}
               >
-              <MagicCard
-                className="p-[1px] rounded-xl relative group"
-                gradientColor="rgba(107,114,128,0.6)"
-              >
-                <div className="relative p-5 bg-white/10 dark:bg-slate-900/40 backdrop-blur-xl rounded-xl border border-white/10">
-                  
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setDeleteDraft(draft);
-                    }}
-                    className="absolute top-5 right-5 p-2 text-red-400 hover:text-red-600"
-                  >
-                    <TrashIcon className="w-6 h-6" />
-                  </button>
+                <MagicCard
+                  className="p-[1px] rounded-xl relative group"
+                  gradientColor="rgba(107,114,128,0.6)"
+                >
+                  <div className="relative p-5 bg-white/10 dark:bg-slate-900/40 backdrop-blur-xl rounded-xl border border-white/10">
 
-                  <h3 className="text-xl font-semibold text-black dark:text-white mb-2">
-                    {draft.title}
-                  </h3>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteDraft(draft);
+                      }}
+                      className="absolute top-5 right-5 p-2 text-red-400 hover:text-red-600"
+                    >
+                      <TrashIcon className="w-6 h-6" />
+                    </button>
 
-                  <p className="text-slate-600 dark:text-slate-100 text-sm mb-4 line-clamp-3">
-                    {draft.description}
-                  </p>
+                    <div className="flex justify-between items-start mb-2 pr-8">
+                      <h3 className="text-xl font-semibold text-black dark:text-white">
+                        {draft.title}
+                      </h3>
+                      <div className={`
+                      px-2 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase border
+                      ${draft.complexity === "LOW" ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400" :
+                          draft.complexity === "HIGH" ? "bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400" :
+                            "bg-blue-500/10 border-blue-500/20 text-blue-600 dark:text-blue-400"}
+                    `}>
+                        {draft.complexity}
+                      </div>
+                    </div>
 
-                  <div className="text-sm text-gray-400">
-                    Status: {draft.status}
+                    <p className="text-slate-600 dark:text-slate-100 text-sm mb-4 line-clamp-3">
+                      {draft.description}
+                    </p>
+
+                    <div className="text-sm text-gray-400">
+                      Status: {draft.status}
+                    </div>
                   </div>
-                </div>
-              </MagicCard>
+                </MagicCard>
               </div>
             ))}
           </div>
